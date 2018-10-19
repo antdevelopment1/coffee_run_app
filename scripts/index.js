@@ -2,8 +2,10 @@
 // Dom Selection
 // =======================================
 const orderForm = document.querySelector('[data-form]');
-const confirmOrderDiv = document.querySelector('[data-confirm]');
-// const waitASec = document.querySelector('[data-wait');
+const notificationArea = document.querySelector('[data-notification]');
+
+const orderListingArea = document.querySelector('[data-order-area]');
+const orderListingButton = document.querySelector('[data-load-orders]')
 
 // =======================================
 // Helper Functions
@@ -22,44 +24,46 @@ function handleSubmit(event) {
         coffee: elements.coffee.value,
         emailAddress: elements.emailAddress.value
     };
-    if (data.flavor === "" || 
-        data.size === "" || 
-        data.coffee === "" || 
-        data.emailAddress === "") {
-        errorMessage.textContent = "Invalid Please fill in the form. Please Try Again!!!";
-        confirmOrderDiv.appendChild(errorMessage);
-        confirmOrderDiv.classList.add('messageBox');
-    } else {
-        errorMessage.textContent = "";
-        fetch(url, {
-            method: method,
-            headers: {
-            "Content-type": "application/json; charset=utf-8",   
-            },
-            body: JSON.stringify(data)
-        })
-        .then(r => r.json())
-        .then(holdOn)
-    }
+    fetch(url, {
+        method: method,
+        headers: {
+        "Content-type": "application/json; charset=utf-8",   
+        },
+        body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then( (orderInfo) => { //Wrap it in a anonymous function  
+        // First checks for the exsistance of then name.
+        if (orderInfo.name && (orderInfo.name === "Validation error")) {
+            notifyUser(`I'm sorry. Please fill out the coffee field and the email address field.`);
+        } else {
+            notifyUser(`Your coffee is totally (not) on the way.`)
+        }
+    })
 }
+
 // ===================
 // Comfirm Users Order
 // ===================
-let message = document.createElement('h1');
-let oneMoment = document.createElement('p');
-let errorMessage = document.createElement('h1');
-
-function holdOn(wait) {
-    confirmOrderDiv.classList.add('messageBox');
-    oneMoment.textContent = 'One moment please while we place your order...';
-    confirmOrderDiv.appendChild(oneMoment);
-    triggerOrderConfirmation();
+function notifyUser(notificationText) {
+    // Create a div
+    const notificationBox = document.createElement('div');
+    // Add some text content
+    // Must checl for exsistance of first child
+    // if (notificationArea.firstChild) {
+    //     notificationArea.removeChild(notificationArea.firstChild);
+    // }
+    notificationBox.textContent = notificationText;
+    notificationArea.innerHTML = "";
+    // Append to Something
+    notificationArea.appendChild(notificationBox);
 }
-function triggerOrderConfirmation(order) {
-    setTimeout(function confirmOrder(order) {
-        message.textContent = "You order has been placed and will be ready for pickup in three to five minutes.";
-        confirmOrderDiv.appendChild(message);
-    }, 4000) 
+
+function getAndShowOrders(event) {
+    console.log('Hey a click');
+    fetch()
+    // console.log(event);
+
 }
 
 // =======================================
@@ -67,3 +71,5 @@ function triggerOrderConfirmation(order) {
 // =======================================
 console.log('About to add event listener');
 orderForm.addEventListener('submit', handleSubmit);
+orderListingButton.addEventListener('click', getAndShowOrders);
+
